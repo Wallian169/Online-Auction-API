@@ -21,7 +21,7 @@ class AuctionLot(models.Model):
     )
 
     @staticmethod
-    def get_unique_image_name(self, filename):
+    def get_unique_image_name(filename):
         ext = filename.split(".")[-1]
         unique_filename = f"{uuid.uuid4().hex}.{ext}"
         return unique_filename

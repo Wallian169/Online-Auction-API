@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -9,6 +10,13 @@ from .serializers import AuctionLotSerializer, BidSerializer
 class AuctionLotListCreateView(generics.ListCreateAPIView):
     queryset = AuctionLot.objects.all()
     serializer_class = AuctionLotSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class AuctionLotDetailView(generics.RetrieveUpdateDestroyAPIView):
