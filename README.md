@@ -14,9 +14,16 @@ Backend for Mate Auction web service
     ```
 3.  Install dependencies
     ```bash
-    pip install -r requirements.txt
+      pip install -r requirements.txt
     ```
-4. Run local server
+4. Create and apply migrations:
+    ```bash
+      python manage.py makemigrations
+    ```
+    ```bash
+      python manage.py migrate
+   ```
+5. Run local server
     ```bash
       python manage.py runserver
     ```
