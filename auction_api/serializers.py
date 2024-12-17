@@ -18,8 +18,7 @@ class AuctionLotSerializer(serializers.ModelSerializer):
             "bids"
         ]
 
-
-class BidSerializer(serializers.Serializer):
+class BidSerializer(serializers.ModelSerializer):
     bidder = serializers.StringRelatedField(read_only=True)
 
     class Meta:
