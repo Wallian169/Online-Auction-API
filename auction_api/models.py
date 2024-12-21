@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 
 import uuid
@@ -13,7 +14,7 @@ class AuctionLot(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     initial_price = models.DecimalField(max_digits=10, decimal_places=2)
     close_time = models.DateTimeField()
-    images = models.ImageField(upload_to="images/", default=True)
+    images = models.ImageField(upload_to="images/", null=True)
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -40,6 +41,18 @@ class Bid(models.Model):
     offered_price = models.DecimalField(max_digits=10, decimal_places=2)
     bidder = models.ForeignKey(User, on_delete=models.CASCADE)
     bid_time = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        if self.offered_price <= self.auction_lot.initial_price:
+            raise ValidationError("The bid must be higher than the initial price.")
+
+        max_bid = self.auction_lot.bids.exclude(id=self.id).order_by("-offered_price").first()
+        if max_bid and self.offered_price <= max_bid.offered_price:
+            raise ValidationError("The bid must be higher than the current highest bid.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.bidder} - {self.offered_price}"
