@@ -55,9 +55,9 @@ class AuctionLot(models.Model):
     )
     winner = models.ForeignKey(
         User,
-        on_delete=models.SET_DEFAULT,
+        on_delete=models.SET_NULL,
         related_name="won_auction_lots",
-        default=None
+        null=True,
     )
 
     def clean(self, *args, **kwargs):
