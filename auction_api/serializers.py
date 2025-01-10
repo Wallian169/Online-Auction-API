@@ -1,9 +1,59 @@
+from django.utils.timezone import now
 from rest_framework import serializers
+
 from auction_api.models import AuctionLot, Bid
 
-class AuctionLotSerializer(serializers.ModelSerializer):
-    bids = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    images = serializers.ImageField(use_url=True)
+
+class AuctionLotBaseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AuctionLot
+        fields = [
+            "item_name",
+            "description",
+            "location",
+            "category_id",
+            "initial_price",
+            "min_step",
+            "buyout_price",
+            "close_time",
+        ]
+
+    @staticmethod
+    def validate_initial_price(value):
+        if value <= 0:
+            raise serializers.ValidationError(
+                "Initial proce must be greater than 0."
+            )
+        return value
+
+    @staticmethod
+    def validate_min_step(value):
+        """Ensure the minimum step is greater than zero."""
+        if value <= 0:
+            raise serializers.ValidationError("Minimum step must be greater than zero.")
+        return value
+
+    @staticmethod
+    def validate_close_time(value):
+        """Ensure close time is in the future."""
+        if value <= now():
+            raise serializers.ValidationError("Close time must be in the future.")
+        return value
+
+    def validate(self, attrs):
+        """Validate fields that depend on each other."""
+        initial_price = attrs.get("initial_price", 0)
+        buyout_price = attrs.get("buyout_price", 0)
+
+        if buyout_price <= initial_price:
+            raise serializers.ValidationError(
+                {"buyout_price": "Buyout price must be higher than the initial price."}
+            )
+
+        return attrs
+
+class AuctionLotSerializer(AuctionLotBaseSerializer):
 
     class Meta:
         model = AuctionLot
@@ -11,11 +61,37 @@ class AuctionLotSerializer(serializers.ModelSerializer):
             "id",
             "item_name",
             "description",
-            "created_at",
+            "location",
+            "category_id",
             "initial_price",
+            "min_step",
+            "buyout_price",
             "close_time",
-            "images",
-            "bids"
+            "owner_id",
+            "winner_id",
+        ]
+
+class AuctionLotDetailSerializer(serializers.ModelSerializer):
+    bids = serializers.PrimaryKeyRelatedField(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta:
+        model = AuctionLot
+        fields = [
+            "id",
+            "item_name",
+            "description",
+            "location",
+            "category_id",
+            "initial_price",
+            "min_step",
+            "buyout_price",
+            "close_time",
+            "owner_id",
+            "bids",
+            "winner_id",
         ]
 
 class BidSerializer(serializers.ModelSerializer):
@@ -30,7 +106,7 @@ class BidSerializer(serializers.ModelSerializer):
         try:
             auction_lot = AuctionLot.objects.get(pk=auction_lot)
         except AuctionLot.DoesNotExist:
-            raise serializers.ValidationError("Auction Lot wasn`t found")
+            raise serializers.ValidationError("AuctionLot was not found")
 
         if value <= auction_lot.initial_price:
             raise serializers.ValidationError(
@@ -40,6 +116,13 @@ class BidSerializer(serializers.ModelSerializer):
         if max_bid and value <= max_bid.offered_price:
             raise serializers.ValidationError(
                 "The bid must be higher then the current highest bid"
+            )
+
+        if max_bid and ((max_bid.offered_price - value) < auction_lot.min_step):
+            raise serializers.ValidationError(
+                "The difference between the new bid"
+                " and the current highest bid must be "
+                f"at least {auction_lot.min_step}."
             )
 
         return value
