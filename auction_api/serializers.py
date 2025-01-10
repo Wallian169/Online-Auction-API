@@ -1,9 +1,22 @@
 from rest_framework import serializers
 from auction_api.models import AuctionLot, Bid
 
-class AuctionLotSerializer(serializers.ModelSerializer):
-    bids = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    images = serializers.ImageField(use_url=True)
+
+class AuctionLotBaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AuctionLot
+        fields = [
+            "item_name",
+            "description",
+            "location",
+            "category_id",
+            "initial_price",
+            "min_step",
+            "buyout_price",
+            "close_time",
+        ]
+
+class AuctionLotSerializer(AuctionLotBaseSerializer):
 
     class Meta:
         model = AuctionLot
@@ -11,11 +24,37 @@ class AuctionLotSerializer(serializers.ModelSerializer):
             "id",
             "item_name",
             "description",
-            "created_at",
+            "location",
+            "category_id",
             "initial_price",
+            "min_step",
+            "buyout_price",
             "close_time",
-            "images",
-            "bids"
+            "owner_id",
+            "winner_id",
+        ]
+
+class AuctionLotDetailSerializer(serializers.ModelSerializer):
+    bids = serializers.PrimaryKeyRelatedField(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta:
+        model = AuctionLot
+        fields = [
+            "id",
+            "item_name",
+            "description",
+            "location",
+            "category_id",
+            "initial_price",
+            "min_step",
+            "buyout_price",
+            "close_time",
+            "owner_id",
+            "bids",
+            "winner_id",
         ]
 
 class BidSerializer(serializers.ModelSerializer):
@@ -41,5 +80,6 @@ class BidSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "The bid must be higher then the current highest bid"
             )
+
 
         return value
