@@ -1,8 +1,11 @@
+from django.utils.timezone import now
 from rest_framework import serializers
+
 from auction_api.models import AuctionLot, Bid
 
 
 class AuctionLotBaseSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = AuctionLot
         fields = [
@@ -15,6 +18,40 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
             "buyout_price",
             "close_time",
         ]
+
+    @staticmethod
+    def validate_initial_price(value):
+        if value <= 0:
+            raise serializers.ValidationError(
+                "Initial proce must be greater than 0."
+            )
+        return value
+
+    @staticmethod
+    def validate_min_step(value):
+        """Ensure the minimum step is greater than zero."""
+        if value <= 0:
+            raise serializers.ValidationError("Minimum step must be greater than zero.")
+        return value
+
+    @staticmethod
+    def validate_close_time(value):
+        """Ensure close time is in the future."""
+        if value <= now():
+            raise serializers.ValidationError("Close time must be in the future.")
+        return value
+
+    def validate(self, attrs):
+        """Validate fields that depend on each other."""
+        initial_price = attrs.get("initial_price", 0)
+        buyout_price = attrs.get("buyout_price", 0)
+
+        if buyout_price <= initial_price:
+            raise serializers.ValidationError(
+                {"buyout_price": "Buyout price must be higher than the initial price."}
+            )
+
+        return attrs
 
 class AuctionLotSerializer(AuctionLotBaseSerializer):
 
