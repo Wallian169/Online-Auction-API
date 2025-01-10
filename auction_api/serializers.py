@@ -69,7 +69,7 @@ class BidSerializer(serializers.ModelSerializer):
         try:
             auction_lot = AuctionLot.objects.get(pk=auction_lot)
         except AuctionLot.DoesNotExist:
-            raise serializers.ValidationError("Auction Lot wasn`t found")
+            raise serializers.ValidationError("AuctionLot was not found")
 
         if value <= auction_lot.initial_price:
             raise serializers.ValidationError(
@@ -81,5 +81,11 @@ class BidSerializer(serializers.ModelSerializer):
                 "The bid must be higher then the current highest bid"
             )
 
+        if max_bid and ((max_bid.offered_price - value) < auction_lot.min_step):
+            raise serializers.ValidationError(
+                "The difference between the new bid"
+                " and the current highest bid must be "
+                f"at least {auction_lot.min_step}."
+            )
 
         return value
