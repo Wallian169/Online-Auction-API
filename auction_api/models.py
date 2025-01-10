@@ -110,8 +110,8 @@ class Bid(models.Model):
 
         if max_bid and (self.offered_price - max_bid.offered_price) < self.auction_lot.min_step:
             raise ValidationError(
-                "The difference between the new bid"
-                " and the current highest bid must be"
+                "The difference between the new bid "
+                "and the current highest bid must be "
                 f"at least {self.auction_lot.min_step}."
             )
 
