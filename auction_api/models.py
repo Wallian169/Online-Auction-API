@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.timezone import now
 
 import uuid
 
@@ -63,6 +64,11 @@ class AuctionLot(models.Model):
     def clean(self, *args, **kwargs):
         if self.buyout_price <= self.initial_price:
             raise ValidationError("Buyout price must be higher than the initial price.")
+        if self.min_step <= 0:
+            raise ValidationError("Minimum step must be greater than zero.")
+        if self.close_time <= now():
+            raise ValidationError("Close time must be in the future.")
+        super().clean(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         self.clean()
