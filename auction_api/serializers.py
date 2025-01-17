@@ -110,8 +110,6 @@ class BidSerializer(serializers.ModelSerializer):
         except AuctionLot.DoesNotExist:
             raise serializers.ValidationError("AuctionLot was not found")
 
-        if
-
         if value <= auction_lot.initial_price:
             raise serializers.ValidationError(
                 "The bid must be higher then the initial price"
