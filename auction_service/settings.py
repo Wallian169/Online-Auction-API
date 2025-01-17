@@ -168,7 +168,7 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": True,
 }
 
-MEDIA_URL = "/media/"
+MEDIA_URL = "files/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

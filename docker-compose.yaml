@@ -26,6 +26,35 @@ services:
       - "5432:5432"
     volumes:
       - my_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  celery:
+    build:
+      context: .
+    container_name: celery
+    command: celery -A auction_service worker --loglevel=info
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   my_db:
