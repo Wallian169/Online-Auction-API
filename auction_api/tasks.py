@@ -28,3 +28,9 @@ def close_auction_lots():
         expired_lot.is_active = False
         expired_lot.winner_id = expired_lot.found_winner
         lots_to_close.append(expired_lot)
+
+
+@shared_task
+def test_task():
+    print("Task executed!")
+    return "Task completed!"
