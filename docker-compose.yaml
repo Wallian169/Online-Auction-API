@@ -56,6 +56,19 @@ services:
       timeout: 5s
       retries: 3
 
+  scheduler:
+    build:
+      context: .
+    container_name: scheduler
+    command: python manage.py run_scheduler
+    depends_on:
+      - redis
+      - db
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+
 volumes:
   my_db:
   my_media:
