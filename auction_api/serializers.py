@@ -1,4 +1,5 @@
-from django.utils.timezone import now
+from django.db.models import Max
+from django.utils import timezone
 from rest_framework import serializers
 
 from auction_api.models import AuctionLot, Bid
@@ -19,39 +20,40 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
             "close_time",
         ]
 
-    @staticmethod
-    def validate_initial_price(value):
-        if value <= 0:
-            raise serializers.ValidationError(
-                "Initial proce must be greater than 0."
-            )
-        return value
+    def validate(self, data):
+        errors = {}
+
+        self._validate_initial_price(data, errors)
+        self._validate_min_step(data, errors)
+        self._validate_buyout_price(data, errors)
+        self._validate_close_time(data, errors)
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return data
 
     @staticmethod
-    def validate_min_step(value):
-        """Ensure the minimum step is greater than zero."""
-        if value <= 0:
-            raise serializers.ValidationError("Minimum step must be greater than zero.")
-        return value
+    def _validate_initial_price(data, errors):
+        if data["initial_price"] <= 0:
+            errors["initial_price"] = "Initial price must be greater than 0."
 
     @staticmethod
-    def validate_close_time(value):
-        """Ensure close time is in the future."""
-        if value <= now():
-            raise serializers.ValidationError("Close time must be in the future.")
-        return value
+    def _validate_min_step(data, errors):
+        if data["min_step"] <= 0:
+            errors["min_step"] = "Minimum step must be greater than 0."
 
-    def validate(self, attrs):
-        """Validate fields that depend on each other."""
-        initial_price = attrs.get("initial_price", 0)
-        buyout_price = attrs.get("buyout_price", 0)
+    @staticmethod
+    def _validate_buyout_price(data, errors):
+        if "initial_price" not in errors:
+            if data["buyout_price"] <= data["initial_price"]:
+                errors["buyout_price"] = "Buyout price must be greater than initial price."
 
-        if buyout_price <= initial_price:
-            raise serializers.ValidationError(
-                {"buyout_price": "Buyout price must be higher than the initial price."}
-            )
-
-        return attrs
+    @staticmethod
+    def _validate_close_time(data, errors):
+        print(data["close_time"])
+        if data["close_time"] <= timezone.now():
+            errors["close_time"] = "Close time must be in the future."
 
 class AuctionLotSerializer(AuctionLotBaseSerializer):
 
@@ -68,6 +70,7 @@ class AuctionLotSerializer(AuctionLotBaseSerializer):
             "buyout_price",
             "close_time",
             "owner_id",
+            "is_active",
             "winner_id",
         ]
 
@@ -102,27 +105,52 @@ class BidSerializer(serializers.ModelSerializer):
         fields = ["id", "auction_lot", "offered_price", "bidder", "bid_time"]
 
     def validate_offered_price(self, value):
-        auction_lot = self.initial_data.get("auction_lot")
-        try:
-            auction_lot = AuctionLot.objects.get(pk=auction_lot)
-        except AuctionLot.DoesNotExist:
-            raise serializers.ValidationError("AuctionLot was not found")
+        auction_lot = self._get_auction_lot()
 
-        if value <= auction_lot.initial_price:
-            raise serializers.ValidationError(
-                "The bid must be higher then the initial price"
-            )
-        max_bid = auction_lot.bids.order_by("-offered_price").first()
-        if max_bid and value <= max_bid.offered_price:
-            raise serializers.ValidationError(
-                "The bid must be higher then the current highest bid"
-            )
-
-        if max_bid and ((max_bid.offered_price - value) < auction_lot.min_step):
-            raise serializers.ValidationError(
-                "The difference between the new bid"
-                " and the current highest bid must be "
-                f"at least {auction_lot.min_step}."
-            )
+        self._validate_close_time(auction_lot)
+        self._validate_initial_price(value, auction_lot)
+        self._validate_offered_price(value, auction_lot)
 
         return value
+
+    def _get_auction_lot(self):
+        auction_lot_id = self.initial_data.get("auction_lot")
+        try:
+            return AuctionLot.objects.annotate(
+                max_bid=Max("bids__offered_price")
+            ).get(id=auction_lot_id)
+        except AuctionLot.DoesNotExist:
+            raise serializers.ValidationError("AuctionLot was not found.")
+
+    @staticmethod
+    def _validate_close_time(auction_lot):
+        auction_lot.refresh_from_db()
+        close_time = auction_lot.close_time
+        current_time = timezone.now()
+        print(f"current_time: {current_time}")
+        print(f"close_time: {close_time}")
+        if close_time <= current_time:
+            raise serializers.ValidationError("The auction is already closed.")
+
+    @staticmethod
+    def _validate_initial_price(value, auction_lot):
+        if value <= auction_lot.initial_price:
+            raise serializers.ValidationError(
+                "The bid must be higher than the initial price."
+            )
+
+    @staticmethod
+    def _validate_offered_price(value, auction_lot):
+        max_bid = auction_lot.max_bid or auction_lot.initial_price
+
+        if max_bid:
+            if value <= max_bid:
+                raise serializers.ValidationError(
+                    f"The bid must be higher than the current highest bid ({max_bid})."
+                )
+            if value - max_bid< auction_lot.min_step:
+                raise serializers.ValidationError(
+                    f"The difference between the new bid"
+                    f" and the current highest bid must be "
+                    f"at least {auction_lot.min_step}."
+                )

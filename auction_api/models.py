@@ -59,6 +59,7 @@ class AuctionLot(models.Model):
         on_delete=models.SET_NULL,
         related_name="won_auction_lots",
         null=True,
+        default=None,
     )
 
     def clean(self, *args, **kwargs):
