@@ -56,7 +56,6 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
             errors["close_time"] = "Close time must be in the future."
 
 class AuctionLotSerializer(AuctionLotBaseSerializer):
-    favourites = serializers.SerializerMethodField()
 
     class Meta:
         model = AuctionLot
@@ -73,17 +72,7 @@ class AuctionLotSerializer(AuctionLotBaseSerializer):
             "owner_id",
             "is_active",
             "winner_id",
-            "favourites",
         ]
-
-        extra_kwargs = {"favourites": {"read_only": True}}
-
-    def get_favourites(self, obj):
-        user = self.context.get('request').user
-        if user.is_authenticated:
-            return user in obj.favourites.all()
-        return False
-
 
 class AuctionLotDetailSerializer(serializers.ModelSerializer):
     bids = serializers.PrimaryKeyRelatedField(
