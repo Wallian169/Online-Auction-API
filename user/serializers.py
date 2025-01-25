@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "password": {
                 "write_only": True,
-                "min_length": 5,
+                "min_length": 6,
                 "style": {"input_type": "password"},
                 "label": "Password",
             }
@@ -42,6 +42,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         write_only=True, required=False, min_length=5, style={"input_type": "password"}
     )
     balance = serializers.DecimalField(read_only=True, decimal_places=2, max_digits=12)
+
 
     class Meta:
         model = get_user_model()
