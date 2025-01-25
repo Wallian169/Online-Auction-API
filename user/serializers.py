@@ -1,8 +1,17 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinLengthValidator, MaxLengthValidator
 from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(validators=[
+        MinLengthValidator(2),
+        MaxLengthValidator(20)
+    ])
+    last_name = serializers.CharField(validators=[
+        MinLengthValidator(2),
+        MaxLengthValidator(30)
+    ])
 
     class Meta:
         model = get_user_model()
