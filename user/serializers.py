@@ -8,7 +8,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = (
             "id",
-            "username",
             "email",
             "first_name",
             "last_name",
@@ -33,16 +32,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True, required=False, min_length=5, style={"input_type": "password"}
     )
+    balance = serializers.DecimalField(read_only=True, decimal_places=2, max_digits=12)
 
     class Meta:
         model = get_user_model()
         fields = (
             "id",
-            "username",
             "email",
             "first_name",
             "last_name",
             "profile_pic",
+            "balance",
             "password"
         )
 
