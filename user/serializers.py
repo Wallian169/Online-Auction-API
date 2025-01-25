@@ -3,6 +3,18 @@ from django.core.validators import MinLengthValidator, MaxLengthValidator
 from rest_framework import serializers
 
 
+def validate_password(value):
+    if len(value) < 6:
+        raise serializers.ValidationError("Password must be at least 6 characters")
+    if not any(char.isdigit() for char in value):
+        raise serializers.ValidationError("Password must contain at least one digit")
+    if not any(char.isupper() for char in value):
+        raise serializers.ValidationError(
+            "Must be at least one uppercase letter"
+        )
+    return value
+
+
 class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(validators=[
         MinLengthValidator(2),
@@ -12,6 +24,16 @@ class UserSerializer(serializers.ModelSerializer):
         MinLengthValidator(2),
         MaxLengthValidator(30)
     ])
+    password = serializers.CharField(
+        write_only=True,
+        help_text=(
+            "Password must be at least 6 characters long, "
+            "contain only latin letters "
+            "(at least one Uppercase letter) and numbers."
+        ),
+        style={"input_type": "password"},
+        validators=[validate_password,]
+    )
 
     class Meta:
         model = get_user_model()
@@ -33,13 +55,18 @@ class UserSerializer(serializers.ModelSerializer):
             }
         }
 
+
     def create(self, validated_data):
         """Create a new user with encrypted password and return it"""
         return get_user_model().objects.create_user(**validated_data)
 
 class UserProfileSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
-        write_only=True, required=False, min_length=5, style={"input_type": "password"}
+        write_only=True,
+        required=False,
+        min_length=6,
+        style={"input_type": "password"},
+        validators=[validate_password,]
     )
     balance = serializers.DecimalField(read_only=True, decimal_places=2, max_digits=12)
 
