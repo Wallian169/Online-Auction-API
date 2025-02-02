@@ -67,6 +67,7 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+
 ROOT_URLCONF = "auction_service.urls"
 
 TEMPLATES = [
