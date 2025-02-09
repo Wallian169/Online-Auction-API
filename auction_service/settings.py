@@ -29,10 +29,13 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don"t run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "[::1]"
+]
 
 
-# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -44,6 +47,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "django_rest_passwordreset",
+    "corsheaders",
     "drf_spectacular",
     "auction_api",
     "user",
@@ -52,12 +56,18 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_CREDENTIALS = True
+
 
 ROOT_URLCONF = "auction_service.urls"
 
