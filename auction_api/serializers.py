@@ -78,11 +78,16 @@ class AuctionLotSerializer(AuctionLotBaseSerializer):
 
         extra_kwargs = {"favourites": {"read_only": True}}
 
-    def get_favourites(self, obj):
-        user = self.context.get('request').user
-        if user.is_authenticated:
-            return user in obj.favourites.all()
-        return False
+    def get_favorites(self, obj):
+        request = self.context.get("request")
+        if not request or not hasattr(request, "user"):
+            return False
+
+        user = request.user
+        if not user.is_authenticated:
+            return False
+
+        return obj.favourites.filter(id=user.id).exists()
 
 
 class AuctionLotDetailSerializer(serializers.ModelSerializer):
