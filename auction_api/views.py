@@ -1,10 +1,11 @@
+from django.db.models import Count
 from drf_spectacular.utils import extend_schema, OpenApiParameter, extend_schema_view
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from auction_api.models import AuctionLot, Bid
+from auction_api.models import AuctionLot, Bid, Category
 from auction_api.serializers import (
     AuctionLotBaseSerializer,
     AuctionLotSerializer,
@@ -105,3 +106,14 @@ class BidListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         auction_lot = AuctionLot.objects.get(pk=self.kwargs["pk"])
         serializer.save(bidder=self.request.user, auction_lot=auction_lot)
+
+# def main_page(request):
+#     top_categories = Category.objects.all()[:3]
+#     lots = AuctionLot.objects.all().select_related("bids")
+#
+#     newest_lots = lots.order_by("-created_at")[:4]
+#     most_popular = lots.annotate(bid_count=Count("bids")).order_by("-bid_count")[:4]
+#
+#     responce_data = {
+#         "top_categories": Categories,
+#     }
