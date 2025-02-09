@@ -89,7 +89,7 @@ class AuctionLotImage(models.Model):
         on_delete=models.CASCADE,
         related_name="images"
     )
-    image = models.ImageField(upload_to="lot_images/")
+    image = models.ImageField(upload_to="lot_images/", null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
