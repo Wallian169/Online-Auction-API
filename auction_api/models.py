@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count
 from django.utils.timezone import now
 
 import uuid
@@ -13,13 +12,13 @@ User = get_user_model()
 def get_unique_image_name(
     filename: str,
 ) -> str:
-    ext = filename.split(".")[-1]
-    unique_filename = f"{uuid.uuid4().hex}.{ext}"
+    name, ext = filename.split(".")
+    unique_filename = f"{name}-{uuid.uuid4().hex}.{ext}"
     return f"{unique_filename}"
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    image = models.ImageField(upload_to='images/', null=True, blank=True)
+    image = models.ImageField(upload_to='images/categories', null=True, blank=True, default=None)
 
     def save(self, *args, **kwargs):
         if self.image:

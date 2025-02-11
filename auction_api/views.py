@@ -107,6 +107,7 @@ class BidListCreateView(generics.ListCreateAPIView):
         auction_lot = AuctionLot.objects.get(pk=self.kwargs["pk"])
         serializer.save(bidder=self.request.user, auction_lot=auction_lot)
 
+
 # def main_page(request):
 #     top_categories = Category.objects.all()[:3]
 #     lots = AuctionLot.objects.all().select_related("bids")

@@ -2,7 +2,7 @@ from django.db.models import Max
 from django.utils import timezone
 from rest_framework import serializers
 
-from auction_api.models import AuctionLot, Bid
+from auction_api.models import AuctionLot, Bid, Category
 
 
 class AuctionLotBaseSerializer(serializers.ModelSerializer):
@@ -170,3 +170,8 @@ class BidSerializer(serializers.ModelSerializer):
                     f" and the current highest bid must be "
                     f"at least {auction_lot.min_step}."
                 )
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "name", "image"]

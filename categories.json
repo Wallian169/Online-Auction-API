@@ -1,0 +1,98 @@
+[
+{
+    "model": "auction_api.category",
+    "pk": 1,
+    "fields": {
+        "name": "Gadgets",
+        "image": "images/categories/gadgets-b60fd3d994494e6ca024a084261c6679-af49f2f0dfbc4784bb46cd49b4760e9d.jpg"
+    }
+},
+{
+    "model": "auction_api.category",
+    "pk": 2,
+    "fields": {
+        "name": "Jewerly",
+        "image": "images/categories/jewerly-a67ea0bd830a45f793db2d423b05acff.jpg"
+    }
+},
+{
+    "model": "auction_api.category",
+    "pk": 3,
+    "fields": {
+        "name": "Art and Antiques",
+        "image": "images/categories/art_antiques-a1ea15fd89d94efb8de712a68499510a.jpg"
+    }
+},
+{
+    "model": "auction_api.category",
+    "pk": 4,
+    "fields": {
+        "name": "Books",
+        "image": "images/categories/books-ae64d5e20db348a1887b8c8d76123d02.jpg"
+    }
+},
+{
+    "model": "auction_api.category",
+    "pk": 5,
+    "fields": {
+        "name": "Records",
+        "image": "images/categories/records-9d58c1fe95fd4e5ba9f1888f538033d6.jpg"
+    }
+},
+{
+    "model": "auction_api.category",
+    "pk": 6,
+    "fields": {
+        "name": "Sports Equipment",
+        "image": "images/categories/sports-640950bf94594e56b8a43ba3a2871e9a.jpg"
+    }
+},
+{
+    "model": "auction_api.category",
+    "pk": 7,
+    "fields": {
+        "name": "Personal transport",
+        "image": "images/categories/transport-2c8d9bd103c144a1acc9974026573a50.jpg"
+    }
+},
+{
+    "model": "auction_api.category",
+    "pk": 8,
+    "fields": {
+        "name": "Clocks",
+        "image": "images/categories/clocks-dd3335d5461e48359748bfbc2538712c.jpg"
+    }
+},
+{
+    "model": "auction_api.category",
+    "pk": 9,
+    "fields": {
+        "name": "Collectibles",
+        "image": "images/categories/collectibles-aebda48eede042b1bc9316221706abd5.jpg"
+    }
+},
+{
+    "model": "auction_api.category",
+    "pk": 10,
+    "fields": {
+        "name": "Clothing and Footwear",
+        "image": "images/categories/clothing-4e944343f915475099ae6b375caaee8c.jpg"
+    }
+},
+{
+    "model": "auction_api.category",
+    "pk": 11,
+    "fields": {
+        "name": "Household",
+        "image": "images/categories/house_hold-e7c0b5fc203b42a7b126ccf3d75d9f3a.jpg"
+    }
+},
+{
+    "model": "auction_api.category",
+    "pk": 12,
+    "fields": {
+        "name": "Other",
+        "image": "images/categories/placeholder-6ee2158172c34e51b33c92d80e27fd2d.jpg"
+    }
+}
+]
