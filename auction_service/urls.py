@@ -22,23 +22,25 @@ from django.urls import path, include
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
-    SpectacularRedocView
+    SpectacularRedocView,
 )
+
+from auction_api.views import main_page
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("user.urls", namespace="user")),
+    path("", main_page, name="main_page"),
+    path("account/", include("user.urls", namespace="user")),
     path("api/", include("auction_api.urls", namespace="auction-api")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    # Optional UI:
     path(
         "api/schema/swagger-ui/",
-         SpectacularSwaggerView.as_view(url_name="schema"),
-         name="swagger-ui"
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
     ),
     path(
         "api/schema/redoc/",
         SpectacularRedocView.as_view(url_name="schema"),
-        name="redoc"
+        name="redoc",
     ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
