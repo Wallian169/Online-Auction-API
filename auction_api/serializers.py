@@ -4,12 +4,14 @@ from rest_framework import serializers
 
 from auction_api.models import AuctionLot, Bid, Category, AuctionLotImage
 
+
 class AuctionImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuctionLotImage
         fields = [
             "image",
         ]
+
 
 class AuctionLotBaseSerializer(serializers.ModelSerializer):
     images = AuctionImageSerializer(many=True, required=True)
@@ -55,7 +57,9 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
     def _validate_buyout_price(data, errors):
         if "initial_price" not in errors:
             if data["buyout_price"] <= data["initial_price"]:
-                errors["buyout_price"] = "Buyout price must be greater than initial price."
+                errors["buyout_price"] = (
+                    "Buyout price must be greater than initial price."
+                )
 
     @staticmethod
     def _validate_close_time(data, errors):
@@ -80,9 +84,13 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
         instance.description = validated_data.get("description", instance.description)
         instance.location = validated_data.get("location", instance.location)
         instance.category_id = validated_data.get("category_id", instance.category_id)
-        instance.initial_price = validated_data.get("initial_price", instance.initial_price)
+        instance.initial_price = validated_data.get(
+            "initial_price", instance.initial_price
+        )
         instance.min_step = validated_data.get("min_step", instance.min_step)
-        instance.buyout_price = validated_data.get("buyout_price", instance.buyout_price)
+        instance.buyout_price = validated_data.get(
+            "buyout_price", instance.buyout_price
+        )
         instance.close_time = validated_data.get("close_time", instance.close_time)
         instance.is_active = validated_data.get("is_active", instance.is_active)
         instance.save()
@@ -92,12 +100,12 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
             for image_data in images_data:
                 serializer = AuctionImageSerializer(data=image_data)
                 if serializer.is_valid():
-                    valid_images.append(AuctionLotImage(lot=lot, **serializer.validated_data))
+                    valid_images.append(
+                        AuctionLotImage(lot=lot, **serializer.validated_data)
+                    )
                 else:
                     raise serializers.ValidationError(serializer.errors)
             AuctionLotImage.objects.bulk_create(valid_images)
-
-
 
 
 class AuctionLotSerializer(AuctionLotBaseSerializer):
@@ -134,15 +142,12 @@ class AuctionLotSerializer(AuctionLotBaseSerializer):
 
         return obj.favourites.filter(id=user.id).exists()
 
+
 class AuctionLotListSerializer(AuctionLotBaseSerializer):
     class Meta:
         model = AuctionLot
-        fields = [
-            "id",
-            "item_name",
-            "initial_price",
-            "images"
-        ]
+        fields = ["id", "item_name", "initial_price", "images"]
+
 
 class AuctionLotDetailSerializer(serializers.ModelSerializer):
     bids = serializers.PrimaryKeyRelatedField(
@@ -167,6 +172,7 @@ class AuctionLotDetailSerializer(serializers.ModelSerializer):
             "winner_id",
         ]
 
+
 class BidSerializer(serializers.ModelSerializer):
     bidder = serializers.StringRelatedField(read_only=True)
 
@@ -186,9 +192,9 @@ class BidSerializer(serializers.ModelSerializer):
     def _get_auction_lot(self):
         auction_lot_id = self.initial_data.get("auction_lot")
         try:
-            return AuctionLot.objects.annotate(
-                max_bid=Max("bids__offered_price")
-            ).get(id=auction_lot_id)
+            return AuctionLot.objects.annotate(max_bid=Max("bids__offered_price")).get(
+                id=auction_lot_id
+            )
         except AuctionLot.DoesNotExist:
             raise serializers.ValidationError("AuctionLot was not found.")
 
@@ -218,12 +224,13 @@ class BidSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     f"The bid must be higher than the current highest bid ({max_bid})."
                 )
-            if value - max_bid< auction_lot.min_step:
+            if value - max_bid < auction_lot.min_step:
                 raise serializers.ValidationError(
                     f"The difference between the new bid"
                     f" and the current highest bid must be "
                     f"at least {auction_lot.min_step}."
                 )
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

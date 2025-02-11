@@ -4,6 +4,7 @@ from django.core.mail import send_mail
 from django.db import models
 from django.contrib.auth.hashers import make_password
 
+
 class CustomUserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -50,7 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=(
             "Designates whether this user should be treated as active. "
             "Unselect this instead of deleting accounts."
-        )
+        ),
     )
     date_joined = models.DateTimeField(auto_now_add=True)
     balance = models.DecimalField(decimal_places=2, max_digits=10, default=0)

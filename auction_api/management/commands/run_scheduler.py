@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from apscheduler.schedulers.background import BackgroundScheduler
 from auction_api.tasks import close_auction_lots
 
+
 class Command(BaseCommand):
     help = "Run the APScheduler"
 

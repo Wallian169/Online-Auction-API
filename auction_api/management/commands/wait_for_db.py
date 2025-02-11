@@ -13,7 +13,6 @@ class Command(BaseCommand):
         "and --max_retries to limit the number of attempts."
     )
 
-
     def add_arguments(self, parser):
         parser.add_argument("--poll_seconds", type=float, default=3)
         parser.add_argument("--max_retries", type=int, default=15)

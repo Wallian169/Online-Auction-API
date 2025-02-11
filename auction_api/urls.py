@@ -11,7 +11,7 @@ urlpatterns = [
     path(
         "auction-lots/<int:pk>/bids/",
         BidListCreateView.as_view(),
-        name="bid-list-create"
+        name="bid-list-create",
     ),
 ]
 

@@ -9,6 +9,7 @@ from django.utils import timezone
 
 User = get_user_model()
 
+
 def get_unique_image_name(
     filename: str,
 ) -> str:
@@ -16,9 +17,12 @@ def get_unique_image_name(
     unique_filename = f"{name}-{uuid.uuid4().hex}.{ext}"
     return f"{unique_filename}"
 
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    image = models.ImageField(upload_to='images/categories', null=True, blank=True, default=None)
+    image = models.ImageField(
+        upload_to="images/categories", null=True, blank=True, default=None
+    )
 
     def save(self, *args, **kwargs):
         if self.image:
@@ -31,6 +35,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class AuctionLot(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -50,9 +55,7 @@ class AuctionLot(models.Model):
     close_time = models.DateTimeField()
     is_active = models.BooleanField(default=True)
     owner = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="auction_lots"
+        User, on_delete=models.CASCADE, related_name="auction_lots"
     )
     winner = models.ForeignKey(
         User,
@@ -61,11 +64,7 @@ class AuctionLot(models.Model):
         null=True,
         default=None,
     )
-    favourites = models.ManyToManyField(
-        User,
-        related_name='favourite_lots',
-        blank=True
-    )
+    favourites = models.ManyToManyField(User, related_name="favourite_lots", blank=True)
 
     def clean(self, *args, **kwargs):
         if self.buyout_price <= self.initial_price:
@@ -83,12 +82,9 @@ class AuctionLot(models.Model):
     def __str__(self):
         return f"{self.item_name} - {self.owner}"
 
+
 class AuctionLotImage(models.Model):
-    lot = models.ForeignKey(
-        AuctionLot,
-        on_delete=models.CASCADE,
-        related_name="images"
-    )
+    lot = models.ForeignKey(AuctionLot, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to="lot_images/", null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
@@ -102,8 +98,11 @@ class AuctionLotImage(models.Model):
     def __str__(self):
         return f"Image {self.id} for {self.lot.item_name}"
 
+
 class Bid(models.Model):
-    auction_lot = models.ForeignKey(AuctionLot, related_name="bids", on_delete=models.CASCADE)
+    auction_lot = models.ForeignKey(
+        AuctionLot, related_name="bids", on_delete=models.CASCADE
+    )
     offered_price = models.DecimalField(max_digits=10, decimal_places=2)
     bidder = models.ForeignKey(User, on_delete=models.CASCADE)
     bid_time = models.DateTimeField(auto_now_add=True)
@@ -115,12 +114,19 @@ class Bid(models.Model):
         if self.offered_price <= self.auction_lot.initial_price:
             raise ValidationError("The bid must be higher than the initial price.")
 
-        max_bid = self.auction_lot.bids.exclude(id=self.id).order_by("-offered_price").first()
+        max_bid = (
+            self.auction_lot.bids.exclude(id=self.id).order_by("-offered_price").first()
+        )
 
         if max_bid and self.offered_price <= max_bid.offered_price:
-            raise ValidationError("The bid must be higher than the current highest bid.")
+            raise ValidationError(
+                "The bid must be higher than the current highest bid."
+            )
 
-        if max_bid and (self.offered_price - max_bid.offered_price) < self.auction_lot.min_step:
+        if (
+            max_bid
+            and (self.offered_price - max_bid.offered_price) < self.auction_lot.min_step
+        ):
             raise ValidationError(
                 "The difference between the new bid "
                 "and the current highest bid must be "
