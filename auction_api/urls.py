@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from auction_api.views import AuctionLotViewSet, BidListCreateView
+from auction_api.views import AuctionLotViewSet, BidListCreateView, main_page
 
 router = DefaultRouter()
 router.register("auction-lots", AuctionLotViewSet, basename="auction-lots")

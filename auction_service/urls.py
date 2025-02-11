@@ -25,8 +25,11 @@ from drf_spectacular.views import (
     SpectacularRedocView
 )
 
+from auction_api.views import main_page
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", main_page, name="main_page"),
     path("account/", include("user.urls", namespace="user")),
     path("api/", include("auction_api.urls", namespace="auction-api")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

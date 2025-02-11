@@ -2,7 +2,7 @@ from django.db.models import Max
 from django.utils import timezone
 from rest_framework import serializers
 
-from auction_api.models import AuctionLot, Bid, Category
+from auction_api.models import AuctionLot, Bid, Category, AuctionLotImage
 
 
 class AuctionLotBaseSerializer(serializers.ModelSerializer):

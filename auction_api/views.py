@@ -1,7 +1,8 @@
 from django.db.models import Count
+from django.db.models.functions import Random
 from drf_spectacular.utils import extend_schema, OpenApiParameter, extend_schema_view
 from rest_framework import viewsets, generics, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -10,8 +11,9 @@ from auction_api.serializers import (
     AuctionLotBaseSerializer,
     AuctionLotSerializer,
     BidSerializer,
-    AuctionLotDetailSerializer,
+    AuctionLotDetailSerializer, CategorySerializer,
 )
+
 
 @extend_schema_view(
     toggle_favourite=extend_schema(
@@ -107,14 +109,29 @@ class BidListCreateView(generics.ListCreateAPIView):
         auction_lot = AuctionLot.objects.get(pk=self.kwargs["pk"])
         serializer.save(bidder=self.request.user, auction_lot=auction_lot)
 
+@api_view(['GET'])
+def main_page(request):
+    """
+    Main page of the API, returns top-3 categories,
+    """
+    top_categories = Category.objects.all()[:4]
+    all_lots = AuctionLot.objects.all()
+    top_lots = (
+        all_lots.annotate(bids_sum=Count("bids"))
+        .order_by("-bids_sum")[:3]
+    )
+    new = (
+        all_lots.order_by("-created_at")[:4]
+    )
+    also_like = (
+        all_lots.order_by(Random())[:12]
+    )
 
-# def main_page(request):
-#     top_categories = Category.objects.all()[:3]
-#     lots = AuctionLot.objects.all().select_related("bids")
-#
-#     newest_lots = lots.order_by("-created_at")[:4]
-#     most_popular = lots.annotate(bid_count=Count("bids")).order_by("-bid_count")[:4]
-#
-#     responce_data = {
-#         "top_categories": Categories,
-#     }
+    response_data = {
+        "categories": CategorySerializer(top_categories, many=True).data,
+        "top_lots": AuctionLotDetailSerializer(top_lots, many=True).data,
+        "new": AuctionLotDetailSerializer(all_lots, many=True).data,
+        "also_like": AuctionLotDetailSerializer(also_like, many=True).data,
+    }
+
+    return Response(response_data)
