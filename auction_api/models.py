@@ -81,7 +81,7 @@ class AuctionLot(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.item_name} - {self.owner.first_name} {self.owner.last_name}"
+        return f"{self.item_name} - {self.owner}"
 
 class AuctionLotImage(models.Model):
     lot = models.ForeignKey(

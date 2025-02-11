@@ -11,7 +11,7 @@ from auction_api.serializers import (
     AuctionLotBaseSerializer,
     AuctionLotSerializer,
     BidSerializer,
-    AuctionLotDetailSerializer, CategorySerializer,
+    AuctionLotDetailSerializer, CategorySerializer, AuctionLotListSerializer,
 )
 
 
@@ -85,6 +85,8 @@ class AuctionLotViewSet(viewsets.ModelViewSet):
             return AuctionLotBaseSerializer
         if self.action == "detail":
             return AuctionLotDetailSerializer
+        if self.action == "list":
+            return AuctionLotListSerializer
         if self.action == "place-bid":
             return BidSerializer
         return self.serializer_class
@@ -113,6 +115,7 @@ class BidListCreateView(generics.ListCreateAPIView):
 def main_page(request):
     """
     Main page of the API, returns top-3 categories,
+    top-4 lots by bids amount, 4 newest lots and 12 random lots
     """
     top_categories = Category.objects.all()[:4]
     all_lots = AuctionLot.objects.all()
@@ -129,9 +132,9 @@ def main_page(request):
 
     response_data = {
         "categories": CategorySerializer(top_categories, many=True).data,
-        "top_lots": AuctionLotDetailSerializer(top_lots, many=True).data,
-        "new": AuctionLotDetailSerializer(all_lots, many=True).data,
-        "also_like": AuctionLotDetailSerializer(also_like, many=True).data,
+        "top_lots": AuctionLotListSerializer(top_lots, many=True).data,
+        "new": AuctionLotListSerializer(new, many=True).data,
+        "also_like": AuctionLotListSerializer(also_like, many=True).data,
     }
 
     return Response(response_data)
