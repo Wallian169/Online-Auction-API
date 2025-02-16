@@ -61,7 +61,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             validate_password,
         ],
     )
-    balance = serializers.DecimalField(read_only=True, decimal_places=2, max_digits=12)
+    balance = serializers.IntegerField(min_value=0)
 
     class Meta:
         model = get_user_model()

@@ -54,7 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(auto_now_add=True)
-    balance = models.DecimalField(decimal_places=2, max_digits=10, default=0)
+    balance = models.IntegerField(default=0)
 
     objects = CustomUserManager()
 

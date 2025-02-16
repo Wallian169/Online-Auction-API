@@ -2,20 +2,11 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.timezone import now
-
-import uuid
-
 from django.utils import timezone
 
+from utils import get_unique_image_name
+
 User = get_user_model()
-
-
-def get_unique_image_name(
-    filename: str,
-) -> str:
-    name, ext = filename.split(".")
-    unique_filename = f"{name}-{uuid.uuid4().hex}.{ext}"
-    return f"{unique_filename}"
 
 
 class Category(models.Model):
