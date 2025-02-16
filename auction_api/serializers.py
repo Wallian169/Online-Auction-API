@@ -13,8 +13,15 @@ class AuctionImageSerializer(serializers.ModelSerializer):
         ]
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "name", "image"]
+
+
 class AuctionLotBaseSerializer(serializers.ModelSerializer):
     images = AuctionImageSerializer(many=True, required=True)
+    available_categories = serializers.SerializerMethodField()
 
     class Meta:
         model = AuctionLot
@@ -78,7 +85,6 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         images_data = validated_data.pop("images", [])
-        lot = instance
 
         instance.item_name = validated_data.get("item_name", instance.item_name)
         instance.description = validated_data.get("description", instance.description)
@@ -96,12 +102,13 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
         instance.save()
 
         if images_data:
+            instance.images.all().delete()
             valid_images = []
             for image_data in images_data:
                 serializer = AuctionImageSerializer(data=image_data)
                 if serializer.is_valid():
                     valid_images.append(
-                        AuctionLotImage(lot=lot, **serializer.validated_data)
+                        AuctionLotImage(lot=instance, **serializer.validated_data)
                     )
                 else:
                     raise serializers.ValidationError(serializer.errors)
@@ -230,9 +237,3 @@ class BidSerializer(serializers.ModelSerializer):
                     f" and the current highest bid must be "
                     f"at least {auction_lot.min_step}."
                 )
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ["id", "name", "image"]

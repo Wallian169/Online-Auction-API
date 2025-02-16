@@ -5,6 +5,7 @@ from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from auction_api.models import AuctionLot, Bid, Category
 from auction_api.serializers import (
@@ -147,3 +148,9 @@ def main_page(request):
     }
 
     return Response(response_data)
+
+class CategoryListView(APIView):
+    def get(self, request):
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data)
