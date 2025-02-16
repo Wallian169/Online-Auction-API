@@ -4,6 +4,8 @@ from django.core.mail import send_mail
 from django.db import models
 from django.contrib.auth.hashers import make_password
 
+from utils import get_unique_image_name
+
 
 class CustomUserManager(BaseUserManager):
     use_in_migrations = True
@@ -84,3 +86,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    def save(self, *args, **kwargs):
+        if self.profile_pic:
+            self.profile_pic.name = get_unique_image_name(self.profile_pic.name)
+        super().save(*args, **kwargs)
