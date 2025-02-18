@@ -21,7 +21,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class AuctionLotBaseSerializer(serializers.ModelSerializer):
     images = AuctionImageSerializer(many=True, required=True)
-    available_categories = serializers.SerializerMethodField()
 
     class Meta:
         model = AuctionLot
