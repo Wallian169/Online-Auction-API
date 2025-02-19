@@ -56,7 +56,6 @@ class AuctionLot(models.Model):
         null=True,
         default=None,
     )
-    favourites = models.ManyToManyField(User, related_name="favourite_lots", blank=True)
 
     def clean(self, *args, **kwargs):
         if self.buyout_price <= self.initial_price:
