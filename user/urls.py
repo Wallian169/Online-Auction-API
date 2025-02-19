@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-from user.views import CreateUserView, ManageUserView
+from user.views import CreateUserView, ManageUserView, get_favorites
 
 urlpatterns = [
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
@@ -17,6 +17,7 @@ urlpatterns = [
         "password-reset",
         include("django_rest_passwordreset.urls", namespace="password_reset"),
     ),
+    path("favorites/", get_favorites, name="get_favorites"),
 ]
 
 app_name = "user"

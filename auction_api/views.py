@@ -18,26 +18,6 @@ from auction_api.serializers import (
 )
 
 
-@extend_schema_view(
-    toggle_favourite=extend_schema(
-        summary="Toggle favourite status of an auction lot",
-        description="Adds or removes an auction lot from the user's favourites.",
-        parameters=[
-            OpenApiParameter(
-                name="pk", description="Auction Lot ID", required=True, type=int
-            )
-        ],
-        responses={
-            200: {"message": "Auction lot removed from favourites."},
-            201: {"message": "Auction lot added to favourites."},
-        },
-    ),
-    favourites=extend_schema(
-        summary="Get all favourite auction lots",
-        description="Returns a list of auction lots that the user has marked as favourites.",
-        responses={200: AuctionLotSerializer(many=True)},
-    ),
-)
 class AuctionLotViewSet(viewsets.ModelViewSet):
     queryset = AuctionLot.objects.all()
     serializer_class = AuctionLotSerializer
@@ -77,15 +57,13 @@ class BidListCreateView(generics.ListCreateAPIView):
 
 @api_view(["GET"])
 def main_page(request):
-    """
-    Main page of the API, returns top-3 categories,
-    top-4 lots by bids amount, 4 newest lots and 12 random lots
-    """
-    top_categories = Category.objects.all()[:4]
+    """Main page of the API"""
+    top_categories = Category.objects.all()[:3]
     all_lots = AuctionLot.objects.all()
+
     top_lots = all_lots.annotate(bids_sum=Count("bids")).order_by("-bids_sum")[:3]
     new = all_lots.order_by("-created_at")[:4]
-    also_like = all_lots.order_by(Random())[:12]
+    also_like = all_lots.order_by("?")[:12]
 
     response_data = {
         "categories": CategorySerializer(top_categories, many=True).data,
