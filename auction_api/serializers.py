@@ -26,7 +26,7 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
         required=False,
         write_only=True,
     )
-    category = CategorySerializer()
+    category = CategorySerializer(read_only=True)
 
     class Meta:
         model = AuctionLot

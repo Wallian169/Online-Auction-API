@@ -37,9 +37,8 @@ class AuctionLot(models.Model):
     location = models.CharField(max_length=100)
     category = models.ForeignKey(
         Category,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="auction_lots",
-        null=True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     initial_price = models.DecimalField(max_digits=10, decimal_places=2)
