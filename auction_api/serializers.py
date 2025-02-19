@@ -20,7 +20,13 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class AuctionLotBaseSerializer(serializers.ModelSerializer):
-    images = AuctionImageSerializer(many=True, required=True)
+    images = AuctionImageSerializer(many=True, read_only=True)
+    images_to_upload = serializers.ListField(
+        child=serializers.ImageField(),
+        required=False,
+        write_only=True,
+    )
+    category = CategorySerializer()
 
     class Meta:
         model = AuctionLot
@@ -28,12 +34,13 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
             "item_name",
             "description",
             "location",
-            "category_id",
+            "category",
             "initial_price",
             "min_step",
             "buyout_price",
             "close_time",
             "images",
+            "images_to_upload"
         ]
 
     def validate(self, data):
@@ -74,48 +81,32 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
             errors["close_time"] = "Close time must be in the future."
 
     def create(self, validated_data):
-        images_data = validated_data.pop("images", [])
+        images_to_upload = validated_data.pop("images_to_upload", [])
         lot = AuctionLot.objects.create(**validated_data)
-
-        for image_data in images_data:
-            AuctionLotImage.objects.create(lot=lot, **image_data)
-
+        for image in images_to_upload:
+            AuctionLotImage.objects.create(
+                lot=lot,
+                image=image
+        )
         return lot
 
     def update(self, instance, validated_data):
-        images_data = validated_data.pop("images", [])
+        images_to_upload = validated_data.pop("images_to_upload", [])
 
-        instance.item_name = validated_data.get("item_name", instance.item_name)
+        for img in instance.images.all():
+            img.delete()
+
+        instance.title = validated_data.get("title", instance.title)
         instance.description = validated_data.get("description", instance.description)
-        instance.location = validated_data.get("location", instance.location)
-        instance.category_id = validated_data.get("category_id", instance.category_id)
-        instance.initial_price = validated_data.get(
-            "initial_price", instance.initial_price
-        )
-        instance.min_step = validated_data.get("min_step", instance.min_step)
-        instance.buyout_price = validated_data.get(
-            "buyout_price", instance.buyout_price
-        )
-        instance.close_time = validated_data.get("close_time", instance.close_time)
-        instance.is_active = validated_data.get("is_active", instance.is_active)
         instance.save()
 
-        if images_data:
-            instance.images.all().delete()
-            valid_images = []
-            for image_data in images_data:
-                serializer = AuctionImageSerializer(data=image_data)
-                if serializer.is_valid():
-                    valid_images.append(
-                        AuctionLotImage(lot=instance, **serializer.validated_data)
-                    )
-                else:
-                    raise serializers.ValidationError(serializer.errors)
-            AuctionLotImage.objects.bulk_create(valid_images)
+        for image in images_to_upload:
+            AuctionLotImage.objects.create(lot=instance, image=image)
+
+        return instance
 
 
 class AuctionLotSerializer(AuctionLotBaseSerializer):
-    favourites = serializers.SerializerMethodField()
 
     class Meta:
         model = AuctionLot
@@ -132,21 +123,7 @@ class AuctionLotSerializer(AuctionLotBaseSerializer):
             "owner_id",
             "is_active",
             "winner_id",
-            "favourites",
         ]
-
-        extra_kwargs = {"favourites": {"read_only": True}}
-
-    def get_favourites(self, obj):
-        request = self.context.get("request")
-        if not request or not hasattr(request, "user"):
-            return False
-
-        user = request.user
-        if not user.is_authenticated:
-            return False
-
-        return obj.favourites.filter(id=user.id).exists()
 
 
 class AuctionLotListSerializer(AuctionLotBaseSerializer):
@@ -155,7 +132,7 @@ class AuctionLotListSerializer(AuctionLotBaseSerializer):
         fields = ["id", "item_name", "initial_price", "images"]
 
 
-class AuctionLotDetailSerializer(serializers.ModelSerializer):
+class AuctionLotDetailSerializer(AuctionLotBaseSerializer):
     bids = serializers.PrimaryKeyRelatedField(
         many=True,
         read_only=True,
@@ -176,6 +153,7 @@ class AuctionLotDetailSerializer(serializers.ModelSerializer):
             "owner_id",
             "bids",
             "winner_id",
+            "images",
         ]
 
 

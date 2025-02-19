@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -85,6 +87,11 @@ class AuctionLotImage(models.Model):
                 filename=self.image.name,
             )
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.image and os.path.isfile(self.image.path):
+            os.remove(self.image.path)
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return f"Image {self.id} for {self.lot.item_name}"
