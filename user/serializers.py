@@ -62,6 +62,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         ],
     )
     balance = serializers.IntegerField(min_value=0)
+    profile_pic = serializers.ImageField(required=False)
 
     class Meta:
         model = get_user_model()

@@ -1,5 +1,8 @@
+import os
+
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
+from django.core.files.storage import default_storage
 from django.core.mail import send_mail
 from django.db import models
 from django.contrib.auth.hashers import make_password
@@ -43,7 +46,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
     email = models.EmailField(unique=True)
-    profile_pic = models.ImageField(upload_to="profile_pic", null=True, blank=True)
+    profile_pic = models.ImageField(
+        upload_to=f"profile_pic",
+        null=True,
+        blank=True
+    )
     is_staff = models.BooleanField(
         default=False,
         help_text="Designates whether the user can log into this admin site.",
@@ -88,6 +95,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     def save(self, *args, **kwargs):
+        if self.pk:
+            old_pic = User.objects.get(pk=self.pk).profile_pic
+            if old_pic and old_pic != self.profile_pic and os.path.exists(old_pic.path):
+                os.remove(old_pic.path)
+
         if self.profile_pic:
             self.profile_pic.name = get_unique_image_name(self.profile_pic.name)
+
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.profile_pic and os.path.exists(self.profile_pic.path):
+            os.remove(self.profile_pic.path)
+        super().delete(*args, **kwargs)
