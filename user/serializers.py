@@ -73,6 +73,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "last_name",
             "profile_pic",
             "balance",
+            "phone_number",
+            "telegram",
+            "instagram",
+            "viber",
             "password",
         )
 
