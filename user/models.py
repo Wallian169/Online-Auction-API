@@ -63,6 +63,25 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(auto_now_add=True)
+    phone_number = models.CharField(
+        max_length=12,
+        null=True,
+        blank=True,
+        default=None,
+    )
+    telegram = models.CharField(
+        max_length=120,
+        null=True,
+        blank=True,
+        default=None,
+    )
+    instagram = models.CharField(
+        max_length=120,
+        null=True,
+        blank=True,
+        default=None,
+    )
+    viber = models.BooleanField(default=False)
     balance = models.IntegerField(default=0)
 
     objects = CustomUserManager()
