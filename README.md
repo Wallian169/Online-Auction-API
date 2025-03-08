@@ -54,20 +54,16 @@ After first built use:
 docker-compose up
 ```
 
-### 5️⃣ Run Database Migrations
-```bash
-docker-compose exec web python manage.py migrate
-```
-
-### 6️⃣ Create a Superuser
+### 5️⃣Create a Superuser
 ```bash
 docker-compose exec -it mate_auction_be-app-1 
 ```
+
 ```bash
-python manage.py createsuperuser
+python3 manage.py createsuperuser
 ```
 
-### 7️⃣ Access the Application
+### ️6️⃣ Access the Application
 - **API Endpoints:** `http://localhost:8000/api/`
 - **Admin Panel:** `http://localhost:8000/admin/`
 
