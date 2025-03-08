@@ -21,11 +21,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class AuctionLotBaseSerializer(serializers.ModelSerializer):
     images = AuctionImageSerializer(many=True, read_only=True)
-    images_to_upload = serializers.ListField(
-        child=serializers.ImageField(),
-        required=False,
-        write_only=True,
-    )
 
     class Meta:
         model = AuctionLot
@@ -39,7 +34,6 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
             "buyout_price",
             "close_time",
             "images",
-            "images_to_upload"
         ]
 
     def validate(self, data):
@@ -80,7 +74,7 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
             errors["close_time"] = "Close time must be in the future."
 
     def create(self, validated_data):
-        images_to_upload = validated_data.pop("images_to_upload", [])
+        images_to_upload = validated_data.pop("images", [])
         lot = AuctionLot.objects.create(**validated_data)
         for image in images_to_upload:
             AuctionLotImage.objects.create(
@@ -90,12 +84,12 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
         return lot
 
     def update(self, instance, validated_data):
-        images_to_upload = validated_data.pop("images_to_upload", [])
+        images_to_upload = validated_data.pop("images", [])
 
         for img in instance.images.all():
             img.delete()
 
-        instance.title = validated_data.get("title", instance.title)
+        instance.item_name = validated_data.get("item_name", instance.item_name)
         instance.description = validated_data.get("description", instance.description)
         instance.save()
 
@@ -103,6 +97,14 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
             AuctionLotImage.objects.create(lot=instance, image=image)
 
         return instance
+
+class AuctionLotCreateSerializer(AuctionLotBaseSerializer):
+    images = serializers.ListField(
+        child=serializers.ImageField(),
+        required=False,
+        write_only=True,
+    )
+
 
 
 class AuctionLotSerializer(AuctionLotBaseSerializer):

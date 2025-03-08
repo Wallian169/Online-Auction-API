@@ -14,7 +14,7 @@ from auction_api.serializers import (
     BidSerializer,
     AuctionLotDetailSerializer,
     CategorySerializer,
-    AuctionLotListSerializer,
+    AuctionLotListSerializer, AuctionLotCreateSerializer,
 )
 
 
@@ -66,8 +66,8 @@ class AuctionLotViewSet(viewsets.ModelViewSet):
 
 
     def get_serializer_class(self):
-        if self.action == "create":
-            return AuctionLotBaseSerializer
+        if self.action in ("create", "update", "partial_update"):
+            return AuctionLotCreateSerializer
         if self.action == "retrieve":
             return AuctionLotDetailSerializer
         if self.action == "list":
