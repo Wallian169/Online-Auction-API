@@ -9,7 +9,6 @@ from rest_framework.views import APIView
 
 from auction_api.models import AuctionLot, Bid, Category, Favorite
 from auction_api.serializers import (
-    AuctionLotBaseSerializer,
     AuctionLotSerializer,
     BidSerializer,
     AuctionLotDetailSerializer,

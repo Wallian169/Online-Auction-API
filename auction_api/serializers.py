@@ -130,7 +130,13 @@ class AuctionLotSerializer(AuctionLotBaseSerializer):
 class AuctionLotListSerializer(AuctionLotBaseSerializer):
     class Meta:
         model = AuctionLot
-        fields = ["id", "item_name", "initial_price", "images"]
+        fields = [
+            "id",
+            "item_name",
+            "initial_price",
+            "images",
+            "close_time"
+        ]
 
 
 class AuctionLotDetailSerializer(AuctionLotBaseSerializer):
