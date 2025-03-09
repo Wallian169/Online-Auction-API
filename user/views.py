@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-from auction_api.models import Favorite
-from auction_api.serializers import AuctionLotListSerializer
+from auction_api.models import Favorite, AuctionLot
+from auction_api.serializers import AuctionLotListSerializer, AuctionLotSerializer
 from user.serializers import UserSerializer, UserProfileSerializer
 
 
@@ -40,3 +40,11 @@ def get_favorites(request):
     serializer = AuctionLotListSerializer(lost, many=True)
 
     return Response(serializer.data)
+
+
+class UserAuctionLotListView(generics.ListAPIView):
+    serializer_class = AuctionLotSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return AuctionLot.objects.filter(user=self.request.user)
