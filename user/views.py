@@ -47,4 +47,4 @@ class UserAuctionLotListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return AuctionLot.objects.filter(user=self.request.user)
+        return AuctionLot.objects.filter(owner=self.request.user)
