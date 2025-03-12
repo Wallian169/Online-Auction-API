@@ -54,13 +54,16 @@ After first built use:
 docker-compose up
 ```
 
-### 5️⃣Create a Superuser
+### 5️⃣Create a Superuser, load categories preset
 ```bash
-docker-compose exec -it mate_auction_be-app-1 
+docker exec -it mate_auction_be-app-1 
 ```
 
 ```bash
-python3 manage.py createsuperuser
+python manage.py createsuperuser
+```
+```bash
+python manage.py loaddata categories.json
 ```
 
 ### ️6️⃣ Access the Application
