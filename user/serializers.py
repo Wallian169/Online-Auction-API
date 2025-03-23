@@ -89,3 +89,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class UserContactsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = (
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "phone_number",
+            "telegram",
+            "instagram",
+            "viber",
+        )
