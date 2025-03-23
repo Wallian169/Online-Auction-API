@@ -1,15 +1,17 @@
-from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from auction_api.models import Favorite, AuctionLot
 from auction_api.serializers import AuctionLotListSerializer, AuctionLotSerializer
 from user.models import User
-from user.serializers import UserSerializer, UserProfileSerializer
+from user.serializers import (
+    UserSerializer,
+    UserProfileSerializer,
+    UserContactsSerializer
+)
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -55,7 +57,8 @@ class UserAuctionLotListView(generics.ListAPIView):
 class UserContactsView(generics.RetrieveAPIView):
     serializer_class = UserProfileSerializer
     permission_classes = (IsAuthenticated,)
+    lookup_field = "pk"
 
     def get_queryset(self):
-        user_id = self.kwargs.get("owner_id")
-        return get_object_or_404(get_user_model(), id=user_id)
+        user_id = self.kwargs.get("pk")
+        return User.objects.filter(id=user_id)

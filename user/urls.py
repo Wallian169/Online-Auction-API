@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-from user.views import CreateUserView, ManageUserView, get_favorites, UserAuctionLotListView
+from user.views import CreateUserView, ManageUserView, get_favorites, UserAuctionLotListView, UserContactsView
 
 urlpatterns = [
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
@@ -18,7 +18,8 @@ urlpatterns = [
         include("django_rest_passwordreset.urls", namespace="password_reset"),
     ),
     path("favorites/", get_favorites, name="get_favorites"),
-    path('my-lots/', UserAuctionLotListView.as_view(), name='user-auction-lots'),
+    path("my-lots/", UserAuctionLotListView.as_view(), name="user-auction-lots"),
+    path("<int:pk>/info", UserContactsView.as_view(), name="user-info"),
 ]
 
 app_name = "user"
