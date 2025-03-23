@@ -10,7 +10,7 @@ from user.models import User
 from user.serializers import (
     UserSerializer,
     UserProfileSerializer,
-    UserContactsSerializer
+    UserInfoSerializer
 )
 
 
@@ -55,7 +55,7 @@ class UserAuctionLotListView(generics.ListAPIView):
         return AuctionLot.objects.filter(owner=self.request.user)
 
 class UserContactsView(generics.RetrieveAPIView):
-    serializer_class = UserProfileSerializer
+    serializer_class = UserInfoSerializer
     permission_classes = (IsAuthenticated,)
     lookup_field = "pk"
 

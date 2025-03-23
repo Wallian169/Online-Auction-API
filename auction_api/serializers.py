@@ -30,6 +30,7 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
             "location",
             "category",
             "initial_price",
+            "last_price",
             "min_step",
             "buyout_price",
             "close_time",
@@ -134,6 +135,7 @@ class AuctionLotListSerializer(AuctionLotBaseSerializer):
             "id",
             "item_name",
             "initial_price",
+            "last_price",
             "images",
             "close_time"
         ]

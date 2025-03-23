@@ -91,7 +91,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserContactsSerializer(serializers.ModelSerializer):
+class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = (
@@ -99,6 +99,7 @@ class UserContactsSerializer(serializers.ModelSerializer):
             "email",
             "first_name",
             "last_name",
+            "profile_pic",
             "phone_number",
             "telegram",
             "instagram",
