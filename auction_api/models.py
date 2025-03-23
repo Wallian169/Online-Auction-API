@@ -42,6 +42,11 @@ class AuctionLot(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     initial_price = models.DecimalField(max_digits=10, decimal_places=2)
+    last_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
     min_step = models.DecimalField(max_digits=10, decimal_places=2)
     buyout_price = models.DecimalField(max_digits=10, decimal_places=2)
     close_time = models.DateTimeField()
@@ -68,6 +73,7 @@ class AuctionLot(models.Model):
 
     def save(self, *args, **kwargs):
         self.clean()
+        self.last_price = self.initial_price
         super().save(*args, **kwargs)
 
     def __str__(self):
