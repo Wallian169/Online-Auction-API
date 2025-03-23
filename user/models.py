@@ -115,11 +115,16 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def save(self, *args, **kwargs):
         if self.pk:
-            old_pic = User.objects.get(pk=self.pk).profile_pic
-            if old_pic and old_pic != self.profile_pic and os.path.exists(old_pic.path):
-                os.remove(old_pic.path)
+            try:
+                old_pic = User.objects.get(pk=self.pk).profile_pic
+                if old_pic and old_pic != self.profile_pic:
+                    old_pic_path = old_pic.path
+                    if os.path.exists(old_pic_path):
+                        os.remove(old_pic_path)
+            except User.DoesNotExist:
+                pass
 
-        if self.profile_pic:
+        if self.profile_pic and not self.pk:
             self.profile_pic.name = get_unique_image_name(self.profile_pic.name)
 
         super().save(*args, **kwargs)
