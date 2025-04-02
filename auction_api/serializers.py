@@ -135,7 +135,7 @@ class AuctionLotListSerializer(AuctionLotBaseSerializer):
             "id",
             "item_name",
             "initial_price",
-            "last_price",
+            "min_step",
             "images",
             "close_time"
         ]
