@@ -14,7 +14,7 @@ def close_auction_lots():
     max_bids = Bid.objects.filter(auction_lot=OuterRef("pk")).order_by("-offered_price")
 
     expired_lots = (
-        AuctionLot.objects.filter(is_active=True, close_time__lte=now())
+        AuctionLot.objects.filter(close_time__lte=now())
         .prefetch_related("bids")
         .annotate(
             max_bid=Subquery(max_bids.values("offered_price")[:1]),
@@ -34,7 +34,8 @@ def close_auction_lots():
             f"Closing lot {expired_lot.id}: " f"Winner id is {expired_lot.found_winner}"
         )
         age = now() - expired_lot.close_time
-        expired_lot.is_active = False
+        if expired_lot.is_active:
+            expired_lot.is_active = False
         expired_lot.winner_id = expired_lot.found_winner
         if age > timedelta(days=3):
             print(f"Deleting lot {expired_lot.id} — expired more than 3 days ago.")
