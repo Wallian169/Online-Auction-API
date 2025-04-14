@@ -128,19 +128,6 @@ class AuctionLotSerializer(AuctionLotBaseSerializer):
         ]
 
 
-class AuctionLotListSerializer(AuctionLotBaseSerializer):
-    class Meta:
-        model = AuctionLot
-        fields = [
-            "id",
-            "item_name",
-            "initial_price",
-            "min_step",
-            "images",
-            "close_time"
-        ]
-
-
 class AuctionLotDetailSerializer(AuctionLotBaseSerializer):
     bids = serializers.PrimaryKeyRelatedField(
         many=True,

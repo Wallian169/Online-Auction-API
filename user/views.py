@@ -5,7 +5,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from auction_api.models import Favorite, AuctionLot
-from auction_api.serializers import AuctionLotListSerializer, AuctionLotSerializer
+from auction_api.serializers import AuctionLotListSerializer, AuctionLotSerializer, AuctionLotDetailSerializer, \
+    AuctionLotBaseSerializer
 from user.models import User
 from user.serializers import (
     UserSerializer,
@@ -39,10 +40,10 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 def get_favorites(request):
     """Return User favorite lots"""
     user = request.user
-    favorites = Favorite.objects.filter(user=user).select_related("auction_lot")
+    favorites = Favorite.objects.filter(user=user).select_related("auction_lot").prefetch_related("auction_lot__images")
 
-    lost = [fav.auction_lot for fav in favorites]
-    serializer = AuctionLotListSerializer(lost, many=True)
+    lots = [fav.auction_lot for fav in favorites]
+    serializer = AuctionLotBaseSerializer(lots, many=True)
 
     return Response(serializer.data)
 

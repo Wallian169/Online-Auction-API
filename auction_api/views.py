@@ -13,7 +13,7 @@ from auction_api.serializers import (
     BidSerializer,
     AuctionLotDetailSerializer,
     CategorySerializer,
-    AuctionLotListSerializer, AuctionLotCreateSerializer,
+    AuctionLotCreateSerializer,
 )
 
 
@@ -69,8 +69,6 @@ class AuctionLotViewSet(viewsets.ModelViewSet):
             return AuctionLotCreateSerializer
         if self.action == "retrieve":
             return AuctionLotDetailSerializer
-        if self.action == "list":
-            return AuctionLotListSerializer
         if self.action == "place-bid":
             return BidSerializer
         return self.serializer_class
@@ -108,9 +106,9 @@ def main_page(request):
 
     response_data = {
         "categories": CategorySerializer(top_categories, many=True).data,
-        "top_lots": AuctionLotListSerializer(top_lots, many=True).data,
-        "new": AuctionLotListSerializer(new, many=True).data,
-        "also_like": AuctionLotListSerializer(also_like, many=True).data,
+        "top_lots": AuctionLotSerializer(top_lots, many=True).data,
+        "new": AuctionLotSerializer(new, many=True).data,
+        "also_like": AuctionLotSerializer(also_like, many=True).data,
     }
 
     return Response(response_data)
