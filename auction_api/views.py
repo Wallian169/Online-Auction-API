@@ -91,6 +91,8 @@ class BidListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         auction_lot = AuctionLot.objects.get(pk=self.kwargs["pk"])
+        auction_lot.last_price = serializer.validated_data["offered_price"]
+        auction_lot.save()
         serializer.save(bidder=self.request.user, auction_lot=auction_lot)
 
 
