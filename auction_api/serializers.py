@@ -21,6 +21,11 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class AuctionLotBaseSerializer(serializers.ModelSerializer):
     images = AuctionImageSerializer(many=True, read_only=True)
+    last_price = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        read_only=True
+    )
 
     class Meta:
         model = AuctionLot
