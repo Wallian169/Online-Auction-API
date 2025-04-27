@@ -7,7 +7,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from auction_api.models import AuctionLot, Bid, Category, Favorite
+from auction_api.models import (
+    AuctionLot,
+    Bid,
+    Category,
+    Favorite,
+    AuctionLotFilter
+)
 from auction_api.serializers import (
     AuctionLotSerializer,
     BidSerializer,
@@ -21,6 +27,7 @@ class AuctionLotViewSet(viewsets.ModelViewSet):
     queryset = AuctionLot.objects.all()
     serializer_class = AuctionLotSerializer
     permission_classes = [IsAuthenticated]
+    filterset_class = AuctionLotFilter
 
     @extend_schema(
         summary="Toggle Favorite Lot",
@@ -65,23 +72,56 @@ class AuctionLotViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         parameters=[
-            OpenApiParameter(name='category', description='Filter by category id', required=False, type=int),
+            OpenApiParameter(
+                name="categories",
+                description="Filter by multiple category IDs",
+                required=False,
+                type={"type": "array", "items": {"type": "integer"}},
+                style="form",
+                explode=True,
+            ),
+            OpenApiParameter(name="name", description="Filter by fragment of name", required=False, type=str),
+            OpenApiParameter(
+                name="price_max",
+                description="Filter max price",
+                required=False,
+                type={"type": "number", "format": "decimal"}
+            ),
+            OpenApiParameter(
+                name="price_min",
+                description="Filter by minimum price",
+                required=False,
+                type={"type": "number", "format": "decimal"}
+            ),
+            OpenApiParameter(
+                name="created_after",
+                description="Filter lots created after this datetime (ISO 8601 format)",
+                required=False,
+                type={"type": "string", "format": "date-time"}
+            ),
+            OpenApiParameter(
+                name="created_before",
+                description="Filter lots created before this datetime (ISO 8601 format)",
+                required=False,
+                type={"type": "string", "format": "date-time"}
+            ),
+            OpenApiParameter(
+                name="close_after",
+                description="Filter lots closing after this datetime (ISO 8601 format)",
+                required=False,
+                type={"type": "string", "format": "date-time"}
+            ),
+            OpenApiParameter(
+                name="close_before",
+                description="Filter lots closing before this datetime (ISO 8601 format)",
+                required=False,
+                type={"type": "string", "format": "date-time"}
+            ),
         ]
     )
     def list(self, request, *args, **kwargs):
         """This is the list view."""
         return super().list(request, *args, **kwargs)
-
-
-    def get_queryset(self):
-        queryset = AuctionLot.objects.all()
-
-        category_id = self.request.query_params.get("category_id", None)
-
-        if category_id:
-            queryset = queryset.filter(category_id=category_id)
-
-        return queryset
 
     def get_serializer_class(self):
         if self.action in ("create", "update", "partial_update"):

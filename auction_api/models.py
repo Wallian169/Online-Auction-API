@@ -1,5 +1,6 @@
 import os
 
+import django_filters
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -155,13 +156,26 @@ class Favorite(models.Model):
     )
 
 class AuctionLotFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(lookup_expr='exact')
-    age = django_filters.NumberFilter(lookup_expr='exact')
-    price = django_filters.NumberFilter(lookup_expr='exact')
-    price_min = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
-    price_max = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
-    categories = django_filters.BaseInFilter(field_name='category_id', lookup_expr='in')
+    name = django_filters.CharFilter(field_name="item_name",lookup_expr="icontains")
+    price_min = django_filters.NumberFilter(field_name="last_price", lookup_expr="gte")
+    price_max = django_filters.NumberFilter(field_name="last_price", lookup_expr="lte")
+    categories = django_filters.BaseInFilter(field_name="category_id", lookup_expr="in")
+
+    created_after = django_filters.IsoDateTimeFilter(field_name="created_at", lookup_expr="gte")
+    created_before = django_filters.IsoDateTimeFilter(field_name="created_at", lookup_expr="lte")
+
+    close_after = django_filters.IsoDateTimeFilter(field_name="close_time", lookup_expr="gte")
+    close_before = django_filters.IsoDateTimeFilter(field_name="close_time", lookup_expr="lte")
 
     class Meta:
         model = AuctionLot
-        fields = ['name', 'age', 'price', 'price_min', 'price_max', 'categories']
+        fields = [
+            "name",
+            "price_min",
+            "price_max",
+            "categories",
+            "created_after",
+            "created_before",
+            "close_after",
+            "close_before"
+        ]
