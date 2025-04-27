@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from auction_api.models import Favorite, AuctionLot
-from auction_api.serializers import AuctionLotSerializer, AuctionLotBaseSerializer
+from auction_api.serializers import AuctionLotSerializer
 from user.models import User
 from user.serializers import (
     UserSerializer,
@@ -42,7 +42,7 @@ def get_favorites(request):
     favorites = Favorite.objects.filter(user=user).select_related("auction_lot").prefetch_related("auction_lot__images")
 
     lots = [fav.auction_lot for fav in favorites]
-    serializer = AuctionLotBaseSerializer(lots, many=True)
+    serializer = AuctionLotSerializer(lots, many=True)
 
     return Response(serializer.data)
 

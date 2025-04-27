@@ -19,7 +19,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ["id", "name", "image"]
 
 
-class AuctionLotBaseSerializer(serializers.ModelSerializer):
+class AuctionLotSerializer(serializers.ModelSerializer):
     images = AuctionImageSerializer(many=True, read_only=True)
     last_price = serializers.DecimalField(
         max_digits=10,
@@ -104,7 +104,7 @@ class AuctionLotBaseSerializer(serializers.ModelSerializer):
 
         return instance
 
-class AuctionLotCreateSerializer(AuctionLotBaseSerializer):
+class AuctionLotCreateSerializer(AuctionLotSerializer):
     images = serializers.ListField(
         child=serializers.ImageField(),
         required=False,
@@ -112,28 +112,7 @@ class AuctionLotCreateSerializer(AuctionLotBaseSerializer):
     )
 
 
-
-class AuctionLotSerializer(AuctionLotBaseSerializer):
-
-    class Meta:
-        model = AuctionLot
-        fields = [
-            "id",
-            "item_name",
-            "description",
-            "location",
-            "category_id",
-            "initial_price",
-            "min_step",
-            "buyout_price",
-            "close_time",
-            "owner_id",
-            "is_active",
-            "winner_id",
-        ]
-
-
-class AuctionLotDetailSerializer(AuctionLotBaseSerializer):
+class AuctionLotDetailSerializer(AuctionLotSerializer):
     bids = serializers.PrimaryKeyRelatedField(
         many=True,
         read_only=True,

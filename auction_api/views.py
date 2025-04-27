@@ -1,5 +1,5 @@
 from django.db.models import Count
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action, api_view
 from rest_framework.generics import get_object_or_404
@@ -63,6 +63,25 @@ class AuctionLotViewSet(viewsets.ModelViewSet):
 
         return Response({"detail": message}, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='category', description='Filter by category id', required=False, type=int),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """This is the list view."""
+        return super().list(request, *args, **kwargs)
+
+
+    def get_queryset(self):
+        queryset = AuctionLot.objects.all()
+
+        category_id = self.request.query_params.get("category_id", None)
+
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action in ("create", "update", "partial_update"):

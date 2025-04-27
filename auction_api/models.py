@@ -153,3 +153,15 @@ class Favorite(models.Model):
         on_delete=models.CASCADE,
         related_name="favorites",
     )
+
+class AuctionLotFilter(django_filters.FilterSet):
+    name = django_filters.CharFilter(lookup_expr='exact')
+    age = django_filters.NumberFilter(lookup_expr='exact')
+    price = django_filters.NumberFilter(lookup_expr='exact')
+    price_min = django_filters.NumberFilter(field_name='price', lookup_expr='gte')
+    price_max = django_filters.NumberFilter(field_name='price', lookup_expr='lte')
+    categories = django_filters.BaseInFilter(field_name='category_id', lookup_expr='in')
+
+    class Meta:
+        model = AuctionLot
+        fields = ['name', 'age', 'price', 'price_min', 'price_max', 'categories']
