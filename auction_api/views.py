@@ -17,15 +17,15 @@ from auction_api.models import (
 from auction_api.serializers import (
     AuctionLotSerializer,
     BidSerializer,
-    AuctionLotDetailSerializer,
     CategorySerializer,
     AuctionLotCreateSerializer,
+    AuctionLotListDetailSerializer,
 )
 
 
 class AuctionLotViewSet(viewsets.ModelViewSet):
     queryset = AuctionLot.objects.all()
-    serializer_class = AuctionLotSerializer
+    serializer_class = AuctionLotListDetailSerializer
     permission_classes = [IsAuthenticated]
     filterset_class = AuctionLotFilter
 
@@ -126,8 +126,6 @@ class AuctionLotViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ("create", "update", "partial_update"):
             return AuctionLotCreateSerializer
-        if self.action == "retrieve":
-            return AuctionLotDetailSerializer
         if self.action == "place-bid":
             return BidSerializer
         return self.serializer_class

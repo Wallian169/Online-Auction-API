@@ -112,31 +112,6 @@ class AuctionLotCreateSerializer(AuctionLotSerializer):
     )
 
 
-class AuctionLotDetailSerializer(AuctionLotSerializer):
-    bids = serializers.PrimaryKeyRelatedField(
-        many=True,
-        read_only=True,
-    )
-
-    class Meta:
-        model = AuctionLot
-        fields = [
-            "id",
-            "item_name",
-            "description",
-            "location",
-            "category_id",
-            "initial_price",
-            "min_step",
-            "buyout_price",
-            "close_time",
-            "owner_id",
-            "bids",
-            "winner_id",
-            "images",
-        ]
-
-
 class BidSerializer(serializers.ModelSerializer):
     bidder = serializers.StringRelatedField(read_only=True)
 
@@ -194,3 +169,24 @@ class BidSerializer(serializers.ModelSerializer):
                     f" and the current highest bid must be "
                     f"at least {auction_lot.min_step}."
                 )
+
+class AuctionLotListDetailSerializer(AuctionLotSerializer):
+    bids = BidSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = AuctionLot
+        fields = [
+            "id",
+            "item_name",
+            "description",
+            "location",
+            "category_id",
+            "initial_price",
+            "min_step",
+            "buyout_price",
+            "close_time",
+            "owner_id",
+            "bids",
+            "winner_id",
+            "images",
+        ]
