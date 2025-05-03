@@ -111,6 +111,23 @@ class AuctionLotCreateSerializer(AuctionLotSerializer):
         write_only=True,
     )
 
+class AuctionLotListSerializer(AuctionLotSerializer):
+    class Meta:
+        model = AuctionLot
+        fields = [
+            "item_name",
+            "description",
+            "location",
+            "category",
+            "initial_price",
+            "last_price",
+            "min_step",
+            "buyout_price",
+            "close_time",
+            "images",
+        ]
+
+
 
 class BidSerializer(serializers.ModelSerializer):
     bidder = serializers.StringRelatedField(read_only=True)
@@ -184,6 +201,7 @@ class AuctionLotListDetailSerializer(AuctionLotSerializer):
             "initial_price",
             "min_step",
             "buyout_price",
+            "created_at",
             "close_time",
             "owner_id",
             "bids",
