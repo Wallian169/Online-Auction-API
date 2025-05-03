@@ -95,25 +95,25 @@ class AuctionLotViewSet(viewsets.ModelViewSet):
             ),
             OpenApiParameter(
                 name="created_after",
-                description="Filter lots created after this datetime (ISO 8601 format)",
+                description="Filter lots created after this datetime (ISO 8601 format, ect. 2025-05-03T14:30:00Z)",
                 required=False,
                 type={"type": "string", "format": "date-time"}
             ),
             OpenApiParameter(
                 name="created_before",
-                description="Filter lots created before this datetime (ISO 8601 format)",
+                description="Filter lots created before this datetime (ISO 8601 format, ect. 2025-05-03T14:30:00Z)",
                 required=False,
                 type={"type": "string", "format": "date-time"}
             ),
             OpenApiParameter(
                 name="close_after",
-                description="Filter lots closing after this datetime (ISO 8601 format)",
+                description="Filter lots closing after this datetime (ISO 8601 format, ect. 2025-05-03T14:30:00Z)",
                 required=False,
                 type={"type": "string", "format": "date-time"}
             ),
             OpenApiParameter(
                 name="close_before",
-                description="Filter lots closing before this datetime (ISO 8601 format)",
+                description="Filter lots closing before this datetime (ISO 8601 format, ect. 2025-05-03T14:30:00Z)",
                 required=False,
                 type={"type": "string", "format": "date-time"}
             ),
@@ -173,6 +173,8 @@ def main_page(request):
     return Response(response_data)
 
 class CategoryListView(APIView):
+    serializer_class = CategorySerializer
+
     def get(self, request):
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
