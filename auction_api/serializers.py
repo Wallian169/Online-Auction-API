@@ -199,6 +199,7 @@ class AuctionLotListDetailSerializer(AuctionLotSerializer):
             "location",
             "category_id",
             "initial_price",
+            "last_price",
             "min_step",
             "buyout_price",
             "created_at",
