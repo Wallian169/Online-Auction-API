@@ -3,6 +3,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from auction_api.models import AuctionLot, Bid, Category, AuctionLotImage
+from user.serializers import UserInfoSerializer
 
 
 class AuctionImageSerializer(serializers.ModelSerializer):
@@ -130,7 +131,7 @@ class AuctionLotListSerializer(AuctionLotSerializer):
 
 
 class BidSerializer(serializers.ModelSerializer):
-    bidder = serializers.StringRelatedField(read_only=True)
+    bidder = UserInfoSerializer(read_only=True)
 
     class Meta:
         model = Bid

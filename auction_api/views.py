@@ -24,7 +24,7 @@ from auction_api.serializers import (
 
 
 class AuctionLotViewSet(viewsets.ModelViewSet):
-    queryset = AuctionLot.objects.all()
+    queryset = AuctionLot.objects.prefetch_related('bids__bidder').all()
     serializer_class = AuctionLotListDetailSerializer
     permission_classes = [IsAuthenticated]
     filterset_class = AuctionLotFilter
