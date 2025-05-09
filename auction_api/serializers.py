@@ -112,10 +112,12 @@ class AuctionLotCreateSerializer(AuctionLotSerializer):
         write_only=True,
     )
 
-class AuctionLotListSerializer(AuctionLotSerializer):
+
+class AuctionLotDetailSerializer(AuctionLotSerializer):
     class Meta:
         model = AuctionLot
         fields = [
+            "id",
             "item_name",
             "description",
             "location",
@@ -124,7 +126,11 @@ class AuctionLotListSerializer(AuctionLotSerializer):
             "last_price",
             "min_step",
             "buyout_price",
+            "created_at",
+            "is_active",
             "close_time",
+            "owner_id",
+            "winner_id",
             "images",
         ]
 

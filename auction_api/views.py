@@ -15,11 +15,11 @@ from auction_api.models import (
     AuctionLotFilter
 )
 from auction_api.serializers import (
-    AuctionLotSerializer,
     BidSerializer,
     CategorySerializer,
     AuctionLotCreateSerializer,
     AuctionLotListDetailSerializer,
+    AuctionLotDetailSerializer,
 )
 
 
@@ -165,9 +165,9 @@ def main_page(request):
 
     response_data = {
         "categories": CategorySerializer(top_categories, many=True).data,
-        "top_lots": AuctionLotSerializer(top_lots, many=True).data,
-        "new": AuctionLotSerializer(new, many=True).data,
-        "also_like": AuctionLotSerializer(also_like, many=True).data,
+        "top_lots": AuctionLotDetailSerializer(top_lots, many=True).data,
+        "new": AuctionLotDetailSerializer(new, many=True).data,
+        "also_like": AuctionLotDetailSerializer(also_like, many=True).data,
     }
 
     return Response(response_data)
