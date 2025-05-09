@@ -155,16 +155,6 @@ class BidSerializer(serializers.ModelSerializer):
         except AuctionLot.DoesNotExist:
             raise serializers.ValidationError("AuctionLot was not found.")
 
-class BidInLotSerializer(BidSerializer):
-    bidder_first_name = serializers.CharField(source="bidder.first_name", read_only=True)
-    bidder_last_name = serializers.CharField(source="bidder.last_name", read_only=True)
-    bidder_profile_pic = serializers.ImageField(source="bidder.profile_pic", read_only=True)
-
-    class Meta:
-        model = Bid
-        fields = ["id", "offered_price", "bid_time",
-                  "bidder_first_name", "bidder_last_name", "bidder_profile_pic"]
-
     @staticmethod
     def _validate_close_time(auction_lot):
         auction_lot.refresh_from_db()
@@ -197,6 +187,18 @@ class BidInLotSerializer(BidSerializer):
                     f" and the current highest bid must be "
                     f"at least {auction_lot.min_step}."
                 )
+
+
+class BidInLotSerializer(BidSerializer):
+    bidder_first_name = serializers.CharField(source="bidder.first_name", read_only=True)
+    bidder_last_name = serializers.CharField(source="bidder.last_name", read_only=True)
+    bidder_profile_pic = serializers.ImageField(source="bidder.profile_pic", read_only=True)
+
+    class Meta:
+        model = Bid
+        fields = ["id", "offered_price", "bid_time",
+                  "bidder_first_name", "bidder_last_name", "bidder_profile_pic"]
+
 
 class AuctionLotListDetailSerializer(AuctionLotSerializer):
     bids = BidInLotSerializer(read_only=True, many=True)
