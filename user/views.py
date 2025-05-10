@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from auction_api.models import Favorite, AuctionLot
-from auction_api.serializers import AuctionLotSerializer
+from auction_api.serializers import AuctionLotDetailSerializer
 from user.models import User
 from user.serializers import (
     UserSerializer,
@@ -31,7 +31,7 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
         summary="Get Favorite Lots",
         description="Returns a list of auction lots favorited "
                     "by the authenticated user.",
-        responses={200: AuctionLotSerializer(many=True)},
+        responses={200: AuctionLotDetailSerializer(many=True)},
     )
 )
 @api_view(["GET"])
@@ -42,13 +42,13 @@ def get_favorites(request):
     favorites = Favorite.objects.filter(user=user).select_related("auction_lot").prefetch_related("auction_lot__images")
 
     lots = [fav.auction_lot for fav in favorites]
-    serializer = AuctionLotSerializer(lots, many=True)
+    serializer = AuctionLotDetailSerializer(lots, many=True)
 
     return Response(serializer.data)
 
 
 class UserAuctionLotListView(generics.ListAPIView):
-    serializer_class = AuctionLotSerializer
+    serializer_class = AuctionLotDetailSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
